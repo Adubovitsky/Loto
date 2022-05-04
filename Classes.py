@@ -68,6 +68,12 @@ class lotterycard:
         print("-" * 26)
 
     def replace_number(self,number, list):
+        """
+        Фукнция проверяет наличие числа в списке и зачеркивает его в случае совпадения
+        :param number: число
+        :param list: список чисел
+        :return: список с замеченными числами
+        """
         for i in range(len(list)):
             if list[i] == number:
                 list[i] = "-"
@@ -100,6 +106,9 @@ class lotterycard:
 
 
 class person_lotterycard(lotterycard):
+    """
+    Наследуемый класс для карточки, в случае если игроком является человек
+    """
 
     def __init__(self, name):
         self.line1 = []
@@ -111,6 +120,10 @@ class person_lotterycard(lotterycard):
         self.numbersincard = {}
 
     def сrossout_number(self,barrel):
+        """
+        Функция проверяет правильность ответвав игроков, которые являются людьми и зачеркивает совпавшие номера, если игрок
+        правильно ответил, что номер выпавшего бочонка есть в его карточке
+        """
         answer = input('Есть ли в вашей карточке такой номер (если да, нажмите "y"/ если нет, нажмите "n")? ')
         if answer == "y":
             if (barrel in self.makeset())==True:
