@@ -58,23 +58,6 @@ class lotterycard:
             result.insert(i, "")
         return result
 
-    # def makefullcard(self,list1,list2,list3):
-    #     """
-    #     функция возвращает общий список, состоящий из трех рядов карточки
-    #     :param list1: ряд 1
-    #     :param list2: ряд 2
-    #     :param list3: ряд 3
-    #     :return:
-    #     """
-    #     self.fullcard = list1+list2+list3
-
-    # def makeset(self, list1):
-    #     """
-    #     создает множество значений, находящихся во всех рядах карточки (в трех списках)
-    #     :return:
-    #     """
-    #     setofalllines = set(self.fullcard)
-    #     return setofalllines
 
     def print_card(self,name):
         """
