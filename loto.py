@@ -30,25 +30,35 @@
 
 """
 
-
-
 import random
+import sys
 from Classes import lotterycard, person_lotterycard
-from functions import get_number, get_type_of_player
 
 name = "Игрок"
-number_of_players = get_number()
+number_of_players = None
+while True:
+    request = input("Введите количество игроков ")
+    if request.isdigit() == True:
+        number_of_players= int(request)
+        break
+    else:
+        print("Неправильно введено количество игроков. Повторите ввод")
+
 players_list = []
 for i in range(0,number_of_players):
     players_list.append(name+" №"+str(i+1))
 
 players_cardlist = []
 for player in players_list:
-    player_choice = get_type_of_player(player)
-    player = person_lotterycard(player) if player_choice == "1" else lotterycard(player)
+    while True:
+        choice_of_player = input("Выберете тип " + player + ': "1" - человек, "2" - компьютер ')
+        if choice_of_player in ["1","2"]:
+            break
+        else:
+            print("Неправильный ввод")
+    player = person_lotterycard(player) if choice_of_player == "1" else lotterycard(player)
     player.newcard()
     players_cardlist.append(player)
-
 
 all_barrels = [i for i in range(1, 91)]
 random.shuffle(all_barrels)
@@ -56,5 +66,19 @@ for i in all_barrels:
     print("Номер бочонка ", i)
     for player in players_cardlist:
         player.print_card(player.name)
-        player.сrossout_number(i)
-        player.find_winner()
+        if player.type == "пользователь":
+            while True:
+                answer = input('Есть ли в вашей карточке такой номер (если да, нажмите "y"/ если нет, нажмите "n")? ')
+                if answer in ["y","n"]:
+                    if player.evaluate_response(i,answer, player.fullcard)==True:
+                        player.replace_number(i, player.fullcard)
+                        break
+                    else:
+                        sys.exit()
+                else:
+                    print("Incorrect input")
+        else:
+            player.replace_number(i, player.fullcard)
+        if player.find_winner(player.fullcard)==True:
+            print("Победителем стал ", player.name)
+            sys.exit()
