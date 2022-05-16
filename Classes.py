@@ -1,6 +1,4 @@
 import random
-import sys
-from functions import remove_symbols
 
 
 class lotterycard:
@@ -9,11 +7,28 @@ class lotterycard:
     """
 
     def __init__(self, name):
+        self.sample1 = []
+        self.sample2 = []
+        self.sample3 = []
         self.line1 = []
         self.line2 = []
         self.line3 = []
         self.fullcard = []
-        self.name = name+' компьютер'
+        self.type = 'компьютер'
+        self.name = name+' '+self.type
+
+    def exclude_from_list(self,main_list, small_list):
+        """
+        Функция удаляет из основного списка значения, которые есть в другом списке
+        :param main_list:
+        :param small_list:
+        :return: разница списков
+        """
+        main_list_set = set(main_list)
+        small_list_set = set(small_list)
+        new_set = main_list_set-small_list_set
+        return list(new_set)
+
 
     def newcard(self):
         """
@@ -22,37 +37,27 @@ class lotterycard:
         :return:
         """
         all_numbers = [i for i in range(1,91)]
-        all_numbers_set = set(all_numbers)
-        line1 = sorted(random.sample(all_numbers,5))
-        line1_set = set(line1)
-        numbers_excl_line1_set = all_numbers_set-line1_set
-        numbers_excl_line1 = list(numbers_excl_line1_set)
-        line2 = sorted(random.sample(numbers_excl_line1,5))
-        line2_set = set(line2)
-        numbers_excl_lines1and2_set = numbers_excl_line1_set-line2_set
-        numbers_excl_lines1and2 = list(numbers_excl_lines1and2_set)
-        line3 = sorted(random.sample(numbers_excl_lines1and2,5))
-        self.line1= self.add_empty_cells(line1)
-        self.line2 = self.add_empty_cells(line2)
-        self.line3 = self.add_empty_cells(line3)
+        self.sample1 = sorted(random.sample(all_numbers,5))
+        numbers_excl_line1 = self.exclude_from_list(all_numbers,self.sample1)
+        self.sample2 = sorted(random.sample(numbers_excl_line1,5))
+        numbers_excl_line2 = self.exclude_from_list(numbers_excl_line1, self.sample2)
+        self.sample3 = sorted(random.sample(numbers_excl_line2,5))
+        self.line1= self.add_empty_cells(self.sample1)
+        self.line2 = self.add_empty_cells(self.sample2)
+        self.line3 = self.add_empty_cells(self.sample3)
+        self.fullcard = self.line1+self.line2+self.line3
 
     def add_empty_cells(self, line):
         """
         Функция добавляет пробелы в список путем случайного выбора индекса элемента списка
         """
-        cells = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        empty_cells = random.sample(cells, 4)
+        cell_index = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        empty_cells = random.sample(cell_index, 4)
+        result = list(line)
         for i in empty_cells:
-            line.insert(i, "")
-        return line
+            result.insert(i, "")
+        return result
 
-    def makeset(self):
-        """
-        создает множество чисел, находящихся во всех рядах карточки
-        :return:
-        """
-        setoflines = set(self.line1 + self.line2 + self.line3)
-        return setoflines
 
     def print_card(self,name):
         """
@@ -60,11 +65,12 @@ class lotterycard:
         :param name: имя игрока
         :return:
         """
+        symbols = ["'", '[', ']', ]
+        self.remove_symbols(self.fullcard,symbols)
         print("-"*3 + name, "-"*3 )
-        symbols = ["'",'[',']',]
-        print(remove_symbols(self.line1,symbols))
-        print(remove_symbols(self.line2, symbols))
-        print(remove_symbols(self.line3, symbols))
+        print(self.fullcard[0:9])
+        print(self.fullcard[9:18])
+        print(self.fullcard[18:27])
         print("-" * 26)
 
     def replace_number(self,number, list):
@@ -79,68 +85,71 @@ class lotterycard:
                 list[i] = "-"
         return list
 
-    def сrossout_number(self,barrel):
+    def remove_symbols(self,list, symbols):
         """
-        проверяет ряды карточки и зачеркивает номер карточки, заменяет цифру на знак "-"
-        :param barrel:
+        Функция удаляет некоторые символы строки
+        :param list:
+        :param symbols:
         :return:
         """
-        self.line1 = self.replace_number(barrel, self.line1)
-        self.line2 = self.replace_number(barrel, self.line2)
-        self.line3 = self.replace_number(barrel, self.line3)
-        # self.line2 = cross_number(barrel, self.line2)
-        # self.line3 = cross_number(barrel, self.line3)
+        string = str(list)
+        for i in string:
+            if i in symbols:
+                string = string.replace(i, "")
+        return string
 
-    def find_winner(self):
+    def evaluate_response(self,barrel, list1):
+        pass
+
+    def find_winner(self, list1):
         """
         проверяет является ли пересечение множества чисел от 1 90 и множества чисел в карточке пустым или не пустым
-        если пересечение пустое, то это означает, что в карточке зачеркнуты все числа и игра заканчивается
         :return:
         """
         all_numbers = [i for i in range(1,91)]
         all_numbers_set = set(all_numbers)
-        result = all_numbers_set&self.makeset()
-        if result == set():
-            print("Победителем стал ",self.name )
-            sys.exit()
+        result = all_numbers_set&set(list1)
+        return result == set()
+
 
 
 class person_lotterycard(lotterycard):
     """
     Наследуемый класс для карточки, в случае если игроком является человек
     """
-
     def __init__(self, name):
         self.line1 = []
         self.line2 = []
         self.line3 = []
         self.fullcard = []
-        self.name = name+' пользователь'
-        self.numbersincardlist = []
-        self.numbersincard = {}
+        self.type = 'пользователь'
+        self.name = name + ' ' + self.type
 
-    def сrossout_number(self,barrel):
+
+    def evaluate_response(self, barrel, answer, list1):
         """
-        Функция проверяет правильность ответвав игроков, которые являются людьми и зачеркивает совпавшие номера, если игрок
-        правильно ответил, что номер выпавшего бочонка есть в его карточке
+        Функция проверяет правильность ответвав игроков, которые являются людьми и прекращает игру в случае неверного ответа
+        :param barrel:
+        :return:
         """
-        answer = input('Есть ли в вашей карточке такой номер (если да, нажмите "y"/ если нет, нажмите "n")? ')
         if answer == "y":
-            if (barrel in self.makeset())==True:
-                self.line1 = self.replace_number(barrel, self.line1)
-                self.line2 = self.replace_number(barrel, self.line2)
-                self.line3 = self.replace_number(barrel, self.line3)
+            if (barrel in set(list1))==True:
                 print("Верно, номер зачеркнут")
+                return True
             else:
-                 print("Неверный ответ. Номера нет Вы проиграли")
-                 sys.exit()
+                print("Неверный ответ. Номера нет Вы проиграли")
+                return False
+
         elif answer == "n":
-             if (barrel in self.makeset())==False:
-                 print("верно")
-             else:
-                 print("Неверный ответ. Номер есть Вы проиграли")
-                 sys.exit()
-        else:
-             print("неправильный ввод")
+            if (barrel in set(list1))==False:
+                print("верно")
+                return True
+
+            else:
+                print("Неверный ответ. Номер есть Вы проиграли")
+                return False
+
+
+
 
 
