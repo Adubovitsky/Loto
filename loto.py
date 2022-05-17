@@ -30,11 +30,12 @@
 
 """
 
+
 import random
 import sys
-from Classes import lotterycard, person_lotterycard
+from Classes import lotterycard, user_player, computer_player
 
-name = "Игрок"
+
 number_of_players = None
 while True:
     request = input("Введите количество игроков ")
@@ -46,39 +47,42 @@ while True:
 
 players_list = []
 for i in range(0,number_of_players):
-    players_list.append(name+" №"+str(i+1))
-
-players_cardlist = []
-for player in players_list:
     while True:
-        choice_of_player = input("Выберете тип " + player + ': "1" - человек, "2" - компьютер ')
+        name = "Игрок №"+str(i+1)
+        choice_of_player = input("Выберете тип " + name + ': "1" - человек, "2" - компьютер ')
         if choice_of_player in ["1","2"]:
             break
         else:
             print("Неправильный ввод")
-    player = person_lotterycard(player) if choice_of_player == "1" else lotterycard(player)
-    player.newcard()
-    players_cardlist.append(player)
+    player = user_player(name) if choice_of_player == "1" else computer_player(name)
+    players_list.append(player)
+
+emptycardlist = [lotterycard(i.name, i.type) for i in players_list]
+cardlist = []
+for card in emptycardlist:
+    card.newcard()
+    cardlist.append(card)
 
 all_barrels = [i for i in range(1, 91)]
 random.shuffle(all_barrels)
 for i in all_barrels:
     print("Номер бочонка ", i)
-    for player in players_cardlist:
-        player.print_card(player.name)
-        if player.type == "пользователь":
+    for card in cardlist:
+         print(card)
+         if card.type == "человек":
             while True:
                 answer = input('Есть ли в вашей карточке такой номер (если да, нажмите "y"/ если нет, нажмите "n")? ')
                 if answer in ["y","n"]:
-                    if player.evaluate_response(i,answer, player.fullcard)==True:
-                        player.replace_number(i, player.fullcard)
+                    if card.evaluate_response(i,answer, card.fullcard)==True:
+                        card.replace_number(i, card.fullcard)
                         break
                     else:
                         sys.exit()
                 else:
                     print("Incorrect input")
-        else:
-            player.replace_number(i, player.fullcard)
-        if player.find_winner(player.fullcard)==True:
-            print("Победителем стал ", player.name)
+         else:
+             card.replace_number(i, card.fullcard)
+         if card.find_winner(card.fullcard)==True:
+            print("Победителем стал ", card.name)
             sys.exit()
+
