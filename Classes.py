@@ -1,12 +1,51 @@
 import random
 
+class player:
+    """
+    Класс, экземляром которого является игрок в лото
+    """
+    def __init__(self, name):
+        self.type = None
+        self.name = None
+
+
+    def __str__(self):
+        return f"{self.name}"
+
+class user_player(player):
+    """
+    Класс игрогов, которое являются любьми
+    """
+    def __init__(self, name):
+        self.type = "человек"
+        self.name = name+' '+self.type
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def __eq__(self, other):
+        return self.type == other.type
+
+class computer_player(player):
+    """
+    Класс игрогов, которое являются любьми
+    """
+    def __init__(self, name):
+        self.type = "комьютер"
+        self.name = name+' '+self.type
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def __eq__(self, other):
+        return self.type == other.type
 
 class lotterycard:
     """
     Класс, экзепляром которого является карточка для игры в лото. Каторчка состоит из трех рядов чисел
     """
 
-    def __init__(self, name):
+    def __init__(self, name, type):
         self.sample1 = []
         self.sample2 = []
         self.sample3 = []
@@ -14,8 +53,9 @@ class lotterycard:
         self.line2 = []
         self.line3 = []
         self.fullcard = []
-        self.type = 'компьютер'
-        self.name = name+' '+self.type
+        self.name = name
+        self.type = type
+
 
     def exclude_from_list(self,main_list, small_list):
         """
@@ -47,6 +87,8 @@ class lotterycard:
         self.line3 = self.add_empty_cells(self.sample3)
         self.fullcard = self.line1+self.line2+self.line3
 
+
+
     def add_empty_cells(self, line):
         """
         Функция добавляет пробелы в список путем случайного выбора индекса элемента списка
@@ -58,20 +100,12 @@ class lotterycard:
             result.insert(i, "")
         return result
 
-
-    def print_card(self,name):
-        """
-        Выводит на экран три ряда чисел в виде одной карточки
-        :param name: имя игрока
-        :return:
-        """
+    def __str__(self):
         symbols = ["'", '[', ']', ]
-        self.remove_symbols(self.fullcard,symbols)
-        print("-"*3 + name, "-"*3 )
-        print(self.fullcard[0:9])
-        print(self.fullcard[9:18])
-        print(self.fullcard[18:27])
-        print("-" * 26)
+        line1 = self.remove_symbols(self.fullcard[0:9],symbols)
+        line2 = self.remove_symbols(self.fullcard[9:18], symbols)
+        line3 = self.remove_symbols(self.fullcard[18:], symbols)
+        return f"---- {self.name} ---\n{line1} \n{line2} \n{line3}\n{'-'*25}"
 
     def replace_number(self,number, list):
         """
@@ -98,34 +132,6 @@ class lotterycard:
                 string = string.replace(i, "")
         return string
 
-    def evaluate_response(self,barrel, list1):
-        pass
-
-    def find_winner(self, list1):
-        """
-        проверяет является ли пересечение множества чисел от 1 90 и множества чисел в карточке пустым или не пустым
-        :return:
-        """
-        all_numbers = [i for i in range(1,91)]
-        all_numbers_set = set(all_numbers)
-        result = all_numbers_set&set(list1)
-        return result == set()
-
-
-
-class person_lotterycard(lotterycard):
-    """
-    Наследуемый класс для карточки, в случае если игроком является человек
-    """
-    def __init__(self, name):
-        self.line1 = []
-        self.line2 = []
-        self.line3 = []
-        self.fullcard = []
-        self.type = 'пользователь'
-        self.name = name + ' ' + self.type
-
-
     def evaluate_response(self, barrel, answer, list1):
         """
         Функция проверяет правильность ответвав игроков, которые являются людьми и прекращает игру в случае неверного ответа
@@ -148,6 +154,22 @@ class person_lotterycard(lotterycard):
             else:
                 print("Неверный ответ. Номер есть Вы проиграли")
                 return False
+
+
+    def find_winner(self, list1):
+        """
+        проверяет является ли пересечение множества чисел от 1 90 и множества чисел в карточке пустым или не пустым
+        :return:
+        """
+        all_numbers = [i for i in range(1,91)]
+        all_numbers_set = set(all_numbers)
+        result = all_numbers_set&set(list1)
+        return result == set()
+
+    def __eq__(self, other):
+        return len(self.fullcard) == len(other.fullcard)
+
+
 
 
 

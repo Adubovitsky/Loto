@@ -1,23 +1,24 @@
 import unittest
-from Classes import lotterycard, person_lotterycard
+from Classes import lotterycard, user_player, computer_player
 
 class Test_lotterycard(unittest.TestCase):
     def test_init(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player","компьютер")
         self.assertEqual(card.line1,[])
         self.assertEqual(card.line2, [])
         self.assertEqual(card.line3, [])
         self.assertEqual(card.fullcard, [])
-        self.assertEqual(card.name, "Player компьютер")
+        self.assertEqual(card.name, "Player")
+        self.assertEqual(card.type, "компьютер")
 
     def test_exludefromlist(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player", "компьютер")
         main_list = [1,2,3,4,5,6,7,8,10]
         small_list = [2,3,4]
         self.assertEqual(card.exclude_from_list(main_list,small_list),[1,5,6,7,8,10])
 
     def test_newcard(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player", "компьютер")
         card.newcard()
         self.assertEqual(len(card.line1), 9)
         self.assertEqual(len(card.line2), 9)
@@ -36,26 +37,26 @@ class Test_lotterycard(unittest.TestCase):
             self.assertLessEqual(int(card.sample3[i]), 91)
 
     def test_addemptycells(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player", "компьютер")
         my_list = [3,12,27,100]
         self.assertEqual(len(card.add_empty_cells(my_list)),8)
         self.assertEqual(len(set(card.add_empty_cells(my_list))), 5)
 
     def test_replacenumber(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player", "компьютер")
         number = 10
         list_1 = [1,3,7,10]
         self.assertNotIn(number,card.replace_number(number,list_1))
 
     def test_findwinner(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player", "компьютер")
         list1 = [0,92,101]
         self.assertTrue(card.find_winner(list1),set())
         list1 = [0, 90, 101]
         self.assertFalse(card.find_winner(list1), set())
 
     def test_evaluateresponse(self):
-        card = person_lotterycard("Player")
+        card = lotterycard("Player", "человек")
         list1 = [1, 32, 11,45,56]
         answer1 = "y"
         barrel1 = 1
@@ -74,7 +75,23 @@ class Test_lotterycard(unittest.TestCase):
         self.assertTrue(card.evaluate_response(barrel4, answer4, list10))
 
     def test_removesymbols(self):
-        card = lotterycard("Player")
+        card = lotterycard("Player", "комьютер")
         list = [":",12,"#","fd","@",90]
         symbols = [":","#","@"]
         self.assertEqual(card.remove_symbols(list,symbols),str(["",12,"","fd","",90]))
+
+    def test__eq__(self):
+        card1 = lotterycard("Player1", "комьютер")
+        card2 = lotterycard("Player2", "человек")
+        self.assertTrue(card1==card2)
+
+class Test_user_player(unittest.TestCase):
+    def test_user__eq__(self):
+        player = user_player("player1")
+        other = user_player("player2")
+        self.assertTrue(player==other)
+
+    def test_comp__eq__(self):
+        player = computer_player("player1")
+        other = computer_player("player2")
+        self.assertTrue(player==other)
